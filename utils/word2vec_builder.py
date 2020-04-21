@@ -70,12 +70,13 @@ if __name__ == '__main__':
     save_data_to_file(all_cut_lines, all_cut_lines_file_path)
 
     build_word2vec(all_cut_lines_file_path, word2vec_file_path, word2vec_bin_file_path,
-                   min_count=5, window=5, size=500, sg=0, iter=5)
+                   min_count=100, window=5, size=256, sg=1, iter=5)
 
     # tests :
     w2v_model = KeyedVectors.load_word2vec_format(word2vec_bin_file_path, binary=True)
     model_test(w2v_model, '宝马', '奔驰')
     model_test(w2v_model, '汽车', '减速')
+    model_test(w2v_model, '汽车', '车')
     model_test(w2v_model, '技师', '车主')
     model_test(w2v_model, '火花塞', '减震器')
     model_test(w2v_model, '刹车片', '解答')

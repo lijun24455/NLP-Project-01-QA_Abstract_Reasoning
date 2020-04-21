@@ -50,13 +50,14 @@ def load_and_parse_data(train_csv_path, test_csv_path):
 def save_data_to_file(data, file_path, cut=False, stop_words=[]):
     print('[save data to file]...file_path:{}'.format(file_path))
     start_time = datetime.datetime.now()
+
     with open(file_path, 'w', encoding='utf-8') as f:
         for line in data:
             if not isinstance(line, str):
                 line = str(line)
             line = clean_space(line).strip()
             if cut:
-                split_words = [x for x in jieba.cut(line, HMM=True) if x not in stop_words]
+                split_words = [x for x in jieba.lcut(line) if x not in stop_words]
                 f.write('{}\n'.format(' '.join(split_words)))
             else:
                 f.write('{}\n'.format(line))
@@ -98,7 +99,7 @@ def cut_sentences_to_vocabs(sentence_list, stop_words):
         if not isinstance(sentence, str):
             sentence = str(sentence)
         sentence = sentence.strip()
-        vocabs = jieba.cut(sentence, HMM=True)
+        vocabs = jieba.lcut(sentence)
         for vocab in vocabs:
             if vocab not in stop_words:
                 vocab_set.add(vocab)
@@ -145,8 +146,9 @@ if __name__ == '__main__':
     train_csv_path = '../resource/AutoMaster_TrainSet.csv'
     test_csv_path = '../resource/AutoMaster_TestSet.csv'
     stopwords_file_path = '../resource/stop_words/i_stopwords.txt'
-    user_dic_file_path = '../resource/user_dic.txt'
+    USER_DIC_PATH = '../resource/user_dic.txt'
     REMOVE_WORDS = {'|', '[', ']', '语音', '图片', '語音', '圖片'}
+
     # gen files:
     vocab_file_path = '../resource/gen/vocab.txt'
     train_x_file_path = '../resource/gen/train_x.txt'
@@ -160,6 +162,7 @@ if __name__ == '__main__':
     train_x, train_y, test_x, test_y = load_and_parse_data(train_csv_path, test_csv_path)
 
     stopwords = load_stopwords(stopwords_file_path, REMOVE_WORDS)
+    jieba.load_userdict(USER_DIC_PATH)
 
     save_data_to_file(train_x, train_x_file_path)
     save_data_to_file(train_x, train_x_cut_file_path, cut=True, stop_words=stopwords)
