@@ -28,4 +28,4 @@
 
  [Week-1 课后作业说明](/md/hw-1.md)
 
-  - [Python 笔记](/md/)
+  - [Python 笔记](/md/note-python.md)
