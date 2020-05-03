@@ -1,8 +1,11 @@
 import multiprocessing
 
 from gensim.models import Word2Vec
+from gensim.models import FastText
 from gensim.models.word2vec import LineSentence
 from gensim.models.keyedvectors import KeyedVectors
+
+from utils.tool import timeit
 
 
 def load_data_from_file(path):
@@ -34,15 +37,31 @@ def save_data_to_file(data, path):
     print('[save_data_to_file] FINISHED! ---> {}'.format(path))
 
 
+@timeit
 def build_word2vec(sentens_path, w2v_path, w2v_bin_path, min_count=10, window=5, size=256, sg=1, iter=5):
     print('[build_word2vec] STARTED...')
     print('Train Model STARTED...')
     w2v = Word2Vec(sg=sg, sentences=LineSentence(sentens_path), size=size, window=window, min_count=min_count,
                    workers=multiprocessing.cpu_count(), iter=iter)
+    ft = FastText(sentences=LineSentence(sentens_path), size=size, window=window, min_count=min_count,
+                  workers=multiprocessing.cpu_count(), iter=iter)
 
     print('Train Model FINISHED! \n Save Model STARTED!')
     w2v.wv.save_word2vec_format(w2v_path, binary=False)
     w2v.wv.save_word2vec_format(w2v_bin_path, binary=True)
+    print('Save Model FINISHED!...')
+
+
+@timeit
+def build_word2vec_fast_text(sentens_path, w2v_path, w2v_bin_path, min_count=10, window=5, size=256, iter=5):
+    print('[build_word2vec_fast_text] STARTED...')
+    print('Train Model STARTED...')
+    ft = FastText(sentences=LineSentence(sentens_path), size=size, window=window, min_count=min_count,
+                  workers=multiprocessing.cpu_count(), iter=iter)
+
+    print('Train Model FINISHED! \n Save Model STARTED!')
+    ft.wv.save_word2vec_format(w2v_path, binary=False)
+    ft.wv.save_word2vec_format(w2v_bin_path, binary=True)
     print('Save Model FINISHED!...')
 
 
@@ -59,8 +78,12 @@ if __name__ == '__main__':
 
     # gen
     all_cut_lines_file_path = '../resource/gen/all_cut_file_path.txt'
+
     word2vec_file_path = '../resource/gen/word2vec.txt'
     word2vec_bin_file_path = '../resource/gen/word2vec_bin.txt'
+
+    word2vec_ft_file_path = '../resource/gen/word2vec_ft.txt'
+    word2vec_ft_bin_file_path = '../resource/gen/word2vec_ft_bin.txt'
 
     all_cut_lines = []
     all_cut_lines += load_data_from_file(train_x_cut_file_path)
@@ -70,7 +93,10 @@ if __name__ == '__main__':
     save_data_to_file(all_cut_lines, all_cut_lines_file_path)
 
     build_word2vec(all_cut_lines_file_path, word2vec_file_path, word2vec_bin_file_path,
-                   min_count=100, window=5, size=256, sg=1, iter=5)
+                   min_count=100, window=5, size=256, sg=1, iter=3)
+
+    build_word2vec_fast_text(all_cut_lines_file_path, word2vec_ft_file_path, word2vec_ft_bin_file_path, min_count=100,
+                             window=10, size=256, iter=3)
 
     # tests :
     w2v_model = KeyedVectors.load_word2vec_format(word2vec_bin_file_path, binary=True)
@@ -80,3 +106,11 @@ if __name__ == '__main__':
     model_test(w2v_model, '技师', '车主')
     model_test(w2v_model, '火花塞', '减震器')
     model_test(w2v_model, '刹车片', '解答')
+
+    w2v_ft_model = KeyedVectors.load_word2vec_format(word2vec_ft_bin_file_path, binary=True)
+    model_test(w2v_ft_model, '宝马', '奔驰')
+    model_test(w2v_ft_model, '汽车', '减速')
+    model_test(w2v_ft_model, '汽车', '车')
+    model_test(w2v_ft_model, '技师', '车主')
+    model_test(w2v_ft_model, '火花塞', '减震器')
+    model_test(w2v_ft_model, '刹车片', '解答')

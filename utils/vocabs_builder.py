@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+from utils.tool import timeit
+
 train_x_cut_file_path = '../resource/gen/train_x_cut.txt'
 train_y_cut_file_path = '../resource/gen/train_y_cut.txt'
 test_x_cut_file_path = '../resource/gen/test_x_cut.txt'
@@ -17,7 +19,7 @@ def load_data(path):
             words += line.split(' ')
     return words
 
-
+@timeit
 def build_vocabs(items, sort=True, min_count=0, lower=False):
     """
     构建词典
