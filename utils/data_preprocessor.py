@@ -4,21 +4,8 @@
 import pandas as pd
 import jieba
 import datetime
-import re
 from jieba import posseg
-
-
-# 去掉多余空格
-def clean_space(text):
-    match_regex = re.compile(u'[\u4e00-\u9fa5。\.,，:：《》、\(\)（）]{1} +(?<![a-zA-Z])|\d+ +| +\d+|[a-z A-Z]+')
-    should_replace_list = match_regex.findall(text)
-    order_replace_list = sorted(should_replace_list, key=lambda i: len(i), reverse=True)
-    for i in order_replace_list:
-        if i == u' ':
-            continue
-        new_i = i.strip()
-        text = text.replace(i, new_i)
-    return text
+from utils.tools import clean_space, load_lines_from_path
 
 
 # 读取数据+简单清洗数据
@@ -64,21 +51,11 @@ def save_data_to_file(data, file_path, cut=False, stop_words=[]):
     print('[save data to file FINISHED]...cost time:{}'.format(datetime.datetime.now() - start_time))
 
 
-# 从文件中读取数据
-def load_data_from_file(file_path):
-    data = []
-    with open(file_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            line = clean_space(line).strip()
-            data.append(line)
-    return data
-
-
 # 加载停用词
 def load_stopwords(file_path, add_stop_word_set):
     print('[Loading Stopwords]...')
     stop_words = set()
-    stop_words_lines = load_data_from_file(file_path)
+    stop_words_lines = load_lines_from_path(file_path, no_space=False)
     for item in stop_words_lines:
         stop_words.add(item)
     stop_words = set.union(stop_words, add_stop_word_set)
@@ -87,8 +64,9 @@ def load_stopwords(file_path, add_stop_word_set):
     return stop_words
 
 
+# 加载用户自定义词典
 def load_user_dic(path):
-    for item in load_data_from_file(path):
+    for item in load_lines_from_path(path, no_space=False):
         jieba.add_word(item)
 
 
@@ -100,20 +78,21 @@ def cut_sentences_to_vocabs(sentence_list, stop_words):
             sentence = str(sentence)
         sentence = sentence.strip()
         vocabs = jieba.lcut(sentence)
-        for vocab in vocabs:
-            if vocab not in stop_words:
-                vocab_set.add(vocab)
+        for item in vocabs:
+            item = item.strip()
+            if len(item) == 0:
+                continue
+            if item not in stop_words:
+                vocab_set.add(item)
     return vocab_set
 
 
 # 保存词典到文件（one-hot格式）
 def save_vocabs_to_file_by_one_hot(file_path, vocabs):
     print('[Write vocabs to file] vocabs cnt:{} ...'.format(len(vocabs)))
-    i = 1
     with open(file_path, 'w', encoding='utf-8') as f:
-        for vocab in vocabs:
-            f.write('{} {}\n'.format(vocab, i))
-            i = i + 1
+        for i, vocab in enumerate(vocabs):
+            f.write("%s\t%d\n" % (vocab, i))
     print('[Write vocabs to file FINISHED] path:{} vocab_cnt:{}'.format(file_path, i))
 
 
@@ -145,7 +124,7 @@ if __name__ == '__main__':
     # 82943 rows
     train_csv_path = '../resource/AutoMaster_TrainSet.csv'
     test_csv_path = '../resource/AutoMaster_TestSet.csv'
-    stopwords_file_path = '../resource/stop_words/i_stopwords.txt'
+    stopwords_file_path = '../resource/stop_words/hit_stopwords.txt'
     USER_DIC_PATH = '../resource/user_dic.txt'
     REMOVE_WORDS = {'|', '[', ']', '语音', '图片', '語音', '圖片'}
 

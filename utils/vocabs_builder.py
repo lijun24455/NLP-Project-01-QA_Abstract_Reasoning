@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from utils.tool import timeit
+from utils.tools import timeit
 
 train_x_cut_file_path = '../resource/gen/train_x_cut.txt'
 train_y_cut_file_path = '../resource/gen/train_y_cut.txt'
@@ -11,6 +11,7 @@ vocabs_f_w_file_path = '../resource/gen/vocabs_f_w.txt'
 
 
 # 加载数据
+@timeit
 def load_data(path):
     words = []
     with open(path, 'r', encoding='utf-8') as f:
@@ -18,6 +19,7 @@ def load_data(path):
             line = line.strip()
             words += line.split(' ')
     return words
+
 
 @timeit
 def build_vocabs(items, sort=True, min_count=0, lower=False):
