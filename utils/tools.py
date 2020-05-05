@@ -48,6 +48,7 @@ def save_lines_to_path(lines, path):
         for line in lines:
             f.write('{}\n'.format(line))
 
+# 根据字典构建embedding_matrix
 @timeit
 def embedding_vector_matrix_build(model, word2idx):
     matrix = {}
@@ -71,6 +72,7 @@ if __name__ == '__main__':
         word2idx[segments[0]] = segments[1]
         idx2word[segments[1]] = segments[0]
 
+    # 加载模型
     w2v_model = KeyedVectors.load_word2vec_format(w2v_bin_path, binary=True)
     ft_model = KeyedVectors.load_word2vec_format(ft_bin_path, binary=True)
 
@@ -80,6 +82,7 @@ if __name__ == '__main__':
     print('w2v matrix size:{}'.format(len(w2v_embedding_matrix)))
     print('ft matrix size:{}'.format(len(ft_embedding_matrix)))
 
+    # 测试
     t_word = '奔驰'
     t_idx = word2idx[t_word]
     print('tWord:{}, tIdx:{}'.format(t_word, t_idx))
@@ -90,4 +93,3 @@ if __name__ == '__main__':
     wv_from_ft_matrix = ft_embedding_matrix[t_idx]
     wv_from_ft_model = ft_model.get_vector(t_word)
     print('wv_from_ft_matrix == wv_from_ft_matrix?:{}'.format((wv_from_ft_matrix == wv_from_ft_model)))
-
