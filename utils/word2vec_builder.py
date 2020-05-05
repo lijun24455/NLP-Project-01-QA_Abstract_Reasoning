@@ -5,7 +5,7 @@ from gensim.models import FastText
 from gensim.models.word2vec import LineSentence
 from gensim.models.keyedvectors import KeyedVectors
 
-from utils.tool import timeit
+from utils.tools import timeit
 
 
 def load_data_from_file(path):
@@ -43,8 +43,6 @@ def build_word2vec(sentens_path, w2v_path, w2v_bin_path, min_count=10, window=5,
     print('Train Model STARTED...')
     w2v = Word2Vec(sg=sg, sentences=LineSentence(sentens_path), size=size, window=window, min_count=min_count,
                    workers=multiprocessing.cpu_count(), iter=iter)
-    ft = FastText(sentences=LineSentence(sentens_path), size=size, window=window, min_count=min_count,
-                  workers=multiprocessing.cpu_count(), iter=iter)
 
     print('Train Model FINISHED! \n Save Model STARTED!')
     w2v.wv.save_word2vec_format(w2v_path, binary=False)
@@ -93,9 +91,9 @@ if __name__ == '__main__':
     save_data_to_file(all_cut_lines, all_cut_lines_file_path)
 
     build_word2vec(all_cut_lines_file_path, word2vec_file_path, word2vec_bin_file_path,
-                   min_count=100, window=5, size=256, sg=1, iter=3)
+                   min_count=10, window=5, size=256, sg=1, iter=3)
 
-    build_word2vec_fast_text(all_cut_lines_file_path, word2vec_ft_file_path, word2vec_ft_bin_file_path, min_count=100,
+    build_word2vec_fast_text(all_cut_lines_file_path, word2vec_ft_file_path, word2vec_ft_bin_file_path, min_count=10,
                              window=10, size=256, iter=3)
 
     # tests :
