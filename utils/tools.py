@@ -48,13 +48,15 @@ def save_lines_to_path(lines, path):
         for line in lines:
             f.write('{}\n'.format(line))
 
+
 # 根据字典构建embedding_matrix
 @timeit
 def embedding_vector_matrix_build(model, word2idx):
     matrix = {}
-    for word, idx in word2idx.items():
-        if word in model:
-            matrix[idx] = model.get_vector(word)
+    for word in model.vocab:
+        if word not in word2idx.keys():
+            continue
+        matrix[word2idx[word]] = model.get_vector(word)
     return matrix
 
 
