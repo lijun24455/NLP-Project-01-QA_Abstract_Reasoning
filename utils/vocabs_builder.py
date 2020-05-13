@@ -17,7 +17,7 @@ def load_data(path):
     with open(path, 'r', encoding='utf-8') as f:
         for line in f:
             line = line.strip()
-            words += line.split(' ')
+            words += line.split()
     return words
 
 
@@ -52,13 +52,14 @@ def build_vocabs(items, sort=True, min_count=0, lower=False):
                 # (w,i)
                 result.append(item)
 
-    vocabs_w_i = [(w, i) for i, w in enumerate(result)]
-    vocabs_i_w = [(i, w) for i, w in enumerate(result)]
+    vocabs_w_i = [(w[0], i) for i, w in enumerate(result)]
+    vocabs_i_w = [(i, w[0]) for i, w in enumerate(result)]
     print('[building vocabs] FINISHED!')
 
     return vocabs_w_i, vocabs_i_w
 
 
+@timeit
 def save_vocabs_to_file(vocabs, path):
     print('[save vocabs file]...')
     with open(path, 'w', encoding='utf-8') as f:
