@@ -5,7 +5,7 @@ import pandas as pd
 import jieba
 import datetime
 from jieba import posseg
-from utils.tools import clean_space, load_lines_from_path
+from src.utils.tools import clean_space, load_lines_from_path
 
 
 # 读取数据+简单清洗数据

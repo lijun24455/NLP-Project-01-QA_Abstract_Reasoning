@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from utils.tools import timeit
+from src.utils.tools import timeit
 
 train_x_cut_file_path = '../resource/gen/train_x_cut.txt'
 train_y_cut_file_path = '../resource/gen/train_y_cut.txt'

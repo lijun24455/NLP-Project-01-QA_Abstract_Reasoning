@@ -5,7 +5,7 @@ from gensim.models import FastText
 from gensim.models.word2vec import LineSentence
 from gensim.models.keyedvectors import KeyedVectors
 
-from utils.tools import timeit, load_lines_from_path
+from src.utils.tools import timeit, load_lines_from_path
 
 
 def load_data_from_file(path):
