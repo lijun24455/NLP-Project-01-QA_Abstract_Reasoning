@@ -1,7 +1,8 @@
 import tensorflow as tf
 from src.encoder import encoder
 from src.decoder import decoder
-from utils.data_utils import load_word2vec
+from src.utils.data_utils import load_word2vec
+
 
 class SequenceToSequence(tf.keras.Model):
     def __init__(self, params):
@@ -9,19 +10,19 @@ class SequenceToSequence(tf.keras.Model):
         self.embedding_matrix = load_word2vec(params)
         self.params = params
         print(params["batch_size"])
-        self.encoder = encoder.Encoder(vocab_size = params["vocab_size"],
-                               embedding_dim = params["embed_size"],
-                               embedding_matrix = self.embedding_matrix,
-                               enc_units = params["enc_units"],
-                               batch_size = params["batch_size"])
+        self.encoder = encoder.Encoder(vocab_size=params["vocab_size"],
+                                       embedding_dim=params["embed_size"],
+                                       embedding_matrix=self.embedding_matrix,
+                                       enc_units=params["enc_units"],
+                                       batch_size=params["batch_size"])
 
-        self.attention = decoder.BahdanauAttention(units = params["attn_units"])
+        self.attention = decoder.BahdanauAttention(units=params["attn_units"])
 
-        self.decoder = decoder.Decoder(vocab_size =  params["vocab_size"],
-                               embedding_dim = params["embed_size"],
-                               embedding_matrix = self.embedding_matrix,
-                               dec_units = params["dec_units"],
-                               batch_size = params["batch_size"])
+        self.decoder = decoder.Decoder(vocab_size=params["vocab_size"],
+                                       embedding_dim=params["embed_size"],
+                                       embedding_matrix=self.embedding_matrix,
+                                       dec_units=params["dec_units"],
+                                       batch_size=params["batch_size"])
 
     # def call_decoder_onestep(self, dec_input, dec_hidden, enc_output):
     #     # context_vector ()
@@ -53,7 +54,7 @@ class SequenceToSequence(tf.keras.Model):
 
             predictions.append(pred)
             attentions.append(attn)
-            #tf.concat与tf.stack这两个函数作用类似，
+            # tf.concat与tf.stack这两个函数作用类似，
             # 都是在某个维度上对矩阵(向量）进行拼接，
             # 不同点在于前者拼接后的矩阵维度不变，后者则会增加一个维度。
         return tf.stack(predictions, 1), dec_hidden
