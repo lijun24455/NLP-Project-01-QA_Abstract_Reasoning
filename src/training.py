@@ -1,7 +1,7 @@
 import tensorflow as tf
-from models.seq2seq import SequenceToSequence
-from utils.batcher_utils import  batcher, Vocab
-from utils.train_helper import train_model
+from src.model.seq2seq import SequenceToSequence
+from src.utils.batcher_utils import batcher, Vocab
+from src.utils.train_helper import train_model
 
 
 def train(params):
@@ -12,7 +12,7 @@ def train(params):
     print('true vocab is ', vocab)
 
     print("Creating the batcher ...")
-    b = batcher(vocab, params) #下次PGN详细讲，仅仅是将数据封装成tf特定的格式
+    b = batcher(vocab, params)  # 下次PGN详细讲，仅仅是将数据封装成tf特定的格式
     print("Building the model ...")
     if params["model"] == "SequenceToSequence":
         model = SequenceToSequence(params)
@@ -35,7 +35,7 @@ def train(params):
         print("Initializing from scratch.")
 
     print("Starting the training ...")
-    train_model(model, b, params, ckpt_manager,vocab)
+    train_model(model, b, params, ckpt_manager, vocab)
 
 
 if __name__ == '__main__':

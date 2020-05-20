@@ -1,16 +1,17 @@
 import sys
 import os
 
+from src import training
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(BASE_DIR)
 
 import tensorflow as tf
 import argparse
-import training
 
 import os
 import pathlib
-from testing import test_and_save
+from src.testing import test_and_save
 
 # 获取项目根目录
 root = pathlib.Path(os.path.abspath(__file__)).parent.parent
@@ -59,8 +60,6 @@ def main():
     parser.add_argument("--max_steps", default=10000, help="Max number of iterations", type=int)
     parser.add_argument("--num_to_test", default=10, help="Number of examples to test", type=int)
     parser.add_argument("--epochs", default=5, help="train epochs", type=int)
-
-
 
     # mode
     parser.add_argument("--mode", default='test', help="training, eval or test options")

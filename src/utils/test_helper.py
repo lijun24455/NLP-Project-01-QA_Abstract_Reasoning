@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
-from utils.batcher_utils import output_to_words
+from src.utils.batcher_utils import output_to_words
+
 
 def batch_greedy_decode(model, enc_data, vocab, params):
     # 判断输入长度
@@ -14,8 +15,8 @@ def batch_greedy_decode(model, enc_data, vocab, params):
 
     enc_output, enc_hidden = model.encoder(inputs)
     dec_hidden = enc_hidden
-#这里解释下为什么要有一个batch_size,因为训练得时候是按照一个batch size扔进去得，所以得到得模型得输入结构也是如此，因此在测试得时候相当于将单个样本
-#乘以batch size那么多遍，然后再得到结果，结果区list得第一个即可，当然理论上list得内容是一样得
+    # 这里解释下为什么要有一个batch_size,因为训练得时候是按照一个batch size扔进去得，所以得到得模型得输入结构也是如此，因此在测试得时候相当于将单个样本
+    # 乘以batch size那么多遍，然后再得到结果，结果区list得第一个即可，当然理论上list得内容是一样得
     dec_input = tf.constant([vocab.word_to_id('[START]')] * batch_size)
     dec_input = tf.expand_dims(dec_input, axis=1)
     # print('enc_output shape is :',enc_output.get_shape())
@@ -48,6 +49,3 @@ def batch_greedy_decode(model, enc_data, vocab, params):
         # 保存结果
         results.append(predict)
     return results
-
-
-

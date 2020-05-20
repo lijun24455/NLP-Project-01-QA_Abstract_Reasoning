@@ -1,9 +1,10 @@
 import tensorflow as tf
-from models.seq2seq import SequenceToSequence
-from utils.batcher_utils import Vocab, batcher
-from utils.test_helper import batch_greedy_decode
+from src.model.seq2seq import SequenceToSequence
+from src.utils.batcher_utils import Vocab, batcher
+from src.utils.test_helper import batch_greedy_decode
 from tqdm import tqdm
-import  pandas  as pd
+import pandas  as pd
+
 
 def test(params):
     global model, ckpt, checkpoint_dir
@@ -30,6 +31,7 @@ def test(params):
     for batch in b:
         yield batch_greedy_decode(model, batch, vocab, params)
 
+
 def test_and_save(params):
     assert params["test_save_dir"], "provide a dir where to save the results"
     gen = test(params)
@@ -43,7 +45,6 @@ def test_and_save(params):
     save_predict_result(results)
 
 
-
 def save_predict_result(results):
     # 读取结果
     test_df = pd.read_csv('/root/pt20200419/data/test.csv')
@@ -54,5 +55,7 @@ def save_predict_result(results):
     # 保存结果.
     test_df.to_csv('/root/pt20200419/data/test_results.csv', index=None, sep=',')
 
+
 if __name__ == '__main__':
     test('我的帕萨特烧机油怎么办')
+

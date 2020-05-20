@@ -42,6 +42,7 @@ class SequenceToSequence(tf.keras.Model):
 
         context_vector, _ = self.attention(dec_hidden, enc_output)
 
+        # dec_target(batch_size, seq_len, vocab_dim)
         for t in range(1, dec_target.shape[1]):
             pred, dec_hidden = self.decoder(dec_input,
                                             dec_hidden,

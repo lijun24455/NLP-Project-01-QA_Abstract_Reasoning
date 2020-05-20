@@ -1,16 +1,18 @@
 import tensorflow as tf
 import time
-from models.losses import loss_function
-import  numpy as np
+from src.model.losses import loss_function
+import numpy as np
 
-def train_model(model, dataset, params, ckpt_manager,vocab):
+
+def train_model(model, dataset, params, ckpt_manager, vocab):
     print(vocab)
     start_index = vocab.word_to_id('[START]')
     pad_index = vocab.word_to_id('[PAD]')
 
     optimizer = tf.keras.optimizers.Adam(name='Adam', learning_rate=params["learning_rate"])
+
     # @tf.function()
-    def train_step(enc_inp, dec_tar,pad_index):
+    def train_step(enc_inp, dec_tar, pad_index):
         with tf.GradientTape() as tape:
             # print('enc_inp shape is final for model :', enc_inp.get_shape())
             enc_output, enc_hidden = model.encoder(enc_inp)
@@ -20,8 +22,8 @@ def train_model(model, dataset, params, ckpt_manager,vocab):
             dec_input = tf.expand_dims([start_index] * params["batch_size"], 1)
             dec_hidden = enc_hidden
             predictions, _ = model(dec_input, dec_hidden, enc_output, dec_tar)
-            loss = loss_function(dec_tar[:,1:],
-                                 predictions,pad_index)
+            loss = loss_function(dec_tar[:, 1:],
+                                 predictions, pad_index)
 
         variables = model.trainable_variables
         gradients = tape.gradient(loss, variables)
@@ -34,20 +36,21 @@ def train_model(model, dataset, params, ckpt_manager,vocab):
         total_loss = 0
         # print(len(dataset.take(params['steps_per_epoch'])))
         for step, batch in enumerate(dataset.take(params['steps_per_epoch'])):
-            #讲设你的样本数是1000，batch size10,一个epoch，我们一共有100次，200， 500， 40，20.
+            # 讲设你的样本数是1000，batch size10,一个epoch，我们一共有100次，200， 500， 40，20.
             batch_loss = train_step(batch[0]["enc_input"],  # shape=(16, 200)
-                              batch[1]["dec_target"],pad_index)  # shape=(16, 50)
+                                    batch[1]["dec_target"], pad_index)  # shape=(16, 50)
             total_loss += batch_loss
             step += 1
             if step % 100 == 0:
                 print('Epoch {} Batch {} Loss {:.4f}'.format(epoch + 1, step, batch_loss.numpy()))
 
-        if epoch % 1 == 0:
+        if epoch % 1 == 0: # 改成增加评价函数，在验证集上做验证，只要比上次好就保存一次
             ckpt_save_path = ckpt_manager.save()
-            print('Saving checkpoint for epoch {} at {} ,best loss {}'.format(epoch + 1, ckpt_save_path, total_loss/step))
-            print('Epoch {} Loss {:.4f}'.format(epoch + 1, total_loss/step))
+            print('Saving checkpoint for epoch {} at {} ,best loss {}'.format(epoch + 1, ckpt_save_path,
+                                                                              total_loss / step))
+            print('Epoch {} Loss {:.4f}'.format(epoch + 1, total_loss / step))
             print('Time taken for 1 epoch {} sec\n'.format(time.time() - t0))
-            #学习率的衰减，按照训练的次数来更新学习率（tf1.x）
-            lr = params['learning_rate'] * np.power(0.9,epoch+1)
+            # 学习率的衰减，按照训练的次数来更新学习率（tf1.x） 加快收敛，一开始可以快速下降，越到后越小步以达到最低；
+            lr = params['learning_rate'] * np.power(0.9, epoch + 1)
             optimizer = tf.keras.optimizers.Adam(name='Adam', learning_rate=lr)
             print("learning_rate=", optimizer.get_config()["learning_rate"])
