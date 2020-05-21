@@ -1,9 +1,11 @@
 import tensorflow as tf
 from src.model.seq2seq import SequenceToSequence
-from src.utils.batcher_utils import Vocab, batcher
+from src.utils.batcher_utils import batcher
 from src.utils.test_helper import batch_greedy_decode
 from tqdm import tqdm
 import pandas  as pd
+
+from src.utils.tools import Vocab
 
 
 def test(params):

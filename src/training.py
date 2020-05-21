@@ -1,6 +1,7 @@
 import tensorflow as tf
 from src.model.seq2seq import SequenceToSequence
-from src.utils.batcher_utils import batcher, Vocab
+from src.utils.batcher_utils import batcher
+from src.utils.tools import Vocab
 from src.utils.train_helper import train_model
 
 

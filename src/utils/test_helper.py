@@ -17,7 +17,7 @@ def batch_greedy_decode(model, enc_data, vocab, params):
     dec_hidden = enc_hidden
     # 这里解释下为什么要有一个batch_size,因为训练得时候是按照一个batch size扔进去得，所以得到得模型得输入结构也是如此，因此在测试得时候相当于将单个样本
     # 乘以batch size那么多遍，然后再得到结果，结果区list得第一个即可，当然理论上list得内容是一样得
-    dec_input = tf.constant([vocab.word_to_id('[START]')] * batch_size)
+    dec_input = tf.constant([vocab.get_id_by_word('[START]')] * batch_size)
     dec_input = tf.expand_dims(dec_input, axis=1)
     # print('enc_output shape is :',enc_output.get_shape())
     # print('dec_hidden shape is :', dec_hidden.get_shape())
@@ -36,7 +36,7 @@ def batch_greedy_decode(model, enc_data, vocab, params):
         # id转换
         predicted_ids = tf.argmax(predictions, axis=1).numpy()
         for index, predicted_id in enumerate(predicted_ids):
-            predicts[index] += vocab.id_to_word(predicted_id) + ' '
+            predicts[index] += vocab.get_word_by_id(predicted_id) + ' '
         # dec_input = tf.expand_dims(predicted_ids, 1)
     results = []
     for predict in predicts:

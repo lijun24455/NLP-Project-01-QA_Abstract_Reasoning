@@ -6,8 +6,8 @@ import numpy as np
 
 def train_model(model, dataset, params, ckpt_manager, vocab):
     print(vocab)
-    start_index = vocab.word_to_id('[START]')
-    pad_index = vocab.word_to_id('[PAD]')
+    start_index = vocab.get_id_by_word('[START]')
+    pad_index = vocab.get_id_by_word('[PAD]')
 
     optimizer = tf.keras.optimizers.Adam(name='Adam', learning_rate=params["learning_rate"])
 

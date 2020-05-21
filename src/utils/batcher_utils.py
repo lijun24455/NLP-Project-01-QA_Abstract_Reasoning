@@ -9,58 +9,58 @@ START_DECODING = '[START]'
 STOP_DECODING = '[STOP]'
 
 
-class Vocab:
-    def __init__(self, vocab_file, max_size):
-        self.word2id = {UNKNOWN_TOKEN: 0, PAD_TOKEN: 1, START_DECODING: 2, STOP_DECODING: 3}
-        self.id2word = {0: UNKNOWN_TOKEN, 1: PAD_TOKEN, 2: START_DECODING, 3: STOP_DECODING}
-        self.count = 4
-
-        with open(vocab_file, 'r', encoding='utf-8') as f:
-            for line in f:
-                pieces = line.split()
-                if len(pieces) != 2:
-                    print('Warning : incorrectly formatted line in vocabulary file : %s\n' % line)
-                    continue
-
-                w = pieces[0]
-                if w in [SENTENCE_START, SENTENCE_END, UNKNOWN_TOKEN, PAD_TOKEN, START_DECODING, STOP_DECODING]:
-                    raise Exception(r'<s>, </s>, [UNK], [PAD], [START] and [STOP] shouldn\'t be in the vocab file, '
-                                    r'but %s is' % w)
-
-                if w in self.word2id:
-                    raise Exception('Duplicated word in vocabulary file: %s' % w)
-
-                self.word2id[w] = self.count
-                self.id2word[self.count] = w
-                self.count += 1
-                if max_size != 0 and self.count >= max_size:
-                    print("max_size of vocab was specified as %i; we now have %i words. Stopping reading."
-                          % (max_size, self.count))
-                    break
-
-        print("Finished constructing vocabulary of %i total words. Last word added: %s" %
-              (self.count, self.id2word[self.count - 1]))
-
-    def word_to_id(self, word):
-        if word not in self.word2id:
-            return self.word2id[UNKNOWN_TOKEN]
-        return self.word2id[word]
-
-    def id_to_word(self, word_id):
-        if word_id not in self.id2word:
-            raise ValueError('Id not found in vocab: %d' % word_id)
-        return self.id2word[word_id]
-
-    def size(self):
-        return self.count
+# class Vocab:
+#     def __init__(self, vocab_file, max_size):
+#         self.word2id = {UNKNOWN_TOKEN: 0, PAD_TOKEN: 1, START_DECODING: 2, STOP_DECODING: 3}
+#         self.id2word = {0: UNKNOWN_TOKEN, 1: PAD_TOKEN, 2: START_DECODING, 3: STOP_DECODING}
+#         self.count = 4
+#
+#         with open(vocab_file, 'r', encoding='utf-8') as f:
+#             for line in f:
+#                 pieces = line.split()
+#                 if len(pieces) != 2:
+#                     print('Warning : incorrectly formatted line in vocabulary file : %s\n' % line)
+#                     continue
+#
+#                 w = pieces[0]
+#                 if w in [SENTENCE_START, SENTENCE_END, UNKNOWN_TOKEN, PAD_TOKEN, START_DECODING, STOP_DECODING]:
+#                     raise Exception(r'<s>, </s>, [UNK], [PAD], [START] and [STOP] shouldn\'t be in the vocab file, '
+#                                     r'but %s is' % w)
+#
+#                 if w in self.word2id:
+#                     raise Exception('Duplicated word in vocabulary file: %s' % w)
+#
+#                 self.word2id[w] = self.count
+#                 self.id2word[self.count] = w
+#                 self.count += 1
+#                 if max_size != 0 and self.count >= max_size:
+#                     print("max_size of vocab was specified as %i; we now have %i words. Stopping reading."
+#                           % (max_size, self.count))
+#                     break
+#
+#         print("Finished constructing vocabulary of %i total words. Last word added: %s" %
+#               (self.count, self.id2word[self.count - 1]))
+#
+#     def get_id_by_word(self, word):
+#         if word not in self.word2id:
+#             return self.word2id[UNKNOWN_TOKEN]
+#         return self.word2id[word]
+#
+#     def id_to_word(self, word_id):
+#         if word_id not in self.id2word:
+#             raise ValueError('Id not found in vocab: %d' % word_id)
+#         return self.id2word[word_id]
+#
+#     def size(self):
+#         return self.count
 
 
 def article_to_ids(article_words, vocab):
     ids = []
     oovs = []
-    unk_id = vocab.word_to_id(UNKNOWN_TOKEN)
+    unk_id = vocab.get_id_by_word(UNKNOWN_TOKEN)
     for w in article_words:
-        i = vocab.word_to_id(w)
+        i = vocab.get_id_by_word(w)
         if i == unk_id:  # If w is OOV
             if w not in oovs:  # Add to list of OOVs
                 oovs.append(w)
@@ -73,9 +73,9 @@ def article_to_ids(article_words, vocab):
 
 def abstract_to_ids(abstract_words, vocab, article_oovs):
     ids = []
-    unk_id = vocab.word_to_id(UNKNOWN_TOKEN)
+    unk_id = vocab.get_id_by_word(UNKNOWN_TOKEN)
     for w in abstract_words:
-        i = vocab.word_to_id(w)
+        i = vocab.get_id_by_word(w)
         if i == unk_id:  # If w is an OOV word
             if w in article_oovs:  # If w is an in-article OOV
                 vocab_idx = vocab.size() + article_oovs.index(w)  # Map to its temporary article OOV number
@@ -91,7 +91,7 @@ def output_to_words(id_list, vocab, article_oovs):
     words = []
     for i in id_list:
         try:
-            w = vocab.id_to_word(i)  # might be [UNK]
+            w = vocab.get_word_by_id(i)  # might be [UNK]
         except ValueError as e:  # w is OOV
             assert article_oovs is not None, "Error: model produced a word ID that isn't in the vocabulary. " \
                                              "This should not happen in baseline (no pointer-generator) mode"
@@ -152,7 +152,6 @@ def get_dec_inp_targ_seqs(sequence, max_len, start_id, stop_id):
 
 
 def example_generator(vocab, train_x_path, train_y_path, test_x_path, max_enc_len, max_dec_len, mode, batch_size):
-
     if mode == "train":
         dataset_train_x = tf.data.TextLineDataset(train_x_path)
         dataset_train_y = tf.data.TextLineDataset(train_y_path)
@@ -163,8 +162,8 @@ def example_generator(vocab, train_x_path, train_y_path, test_x_path, max_enc_le
             article = raw_record[0].numpy().decode("utf-8")
             abstract = raw_record[1].numpy().decode("utf-8")
 
-            start_decoding = vocab.word_to_id(START_DECODING)
-            stop_decoding = vocab.word_to_id(STOP_DECODING)
+            start_decoding = vocab.get_id_by_word(START_DECODING)
+            stop_decoding = vocab.get_id_by_word(STOP_DECODING)
 
             article_words = article.split()[:max_enc_len]
             enc_len = len(article_words)
@@ -174,13 +173,13 @@ def example_generator(vocab, train_x_path, train_y_path, test_x_path, max_enc_le
             sample_encoder_pad_mask = [1 for _ in range(enc_len)]
             # print('sample_encoder_pad_mask is', sample_encoder_pad_mask)
 
-            enc_input = [vocab.word_to_id(w) for w in article_words]
+            enc_input = [vocab.get_id_by_word(w) for w in article_words]
             # print('enc_inp shape is final for dataset:', len(enc_input))
             enc_input_extend_vocab, article_oovs = article_to_ids(article_words, vocab)
 
             abstract_sentences = [""]
             abstract_words = abstract.split()
-            abs_ids = [vocab.word_to_id(w) for w in abstract_words]
+            abs_ids = [vocab.get_id_by_word(w) for w in abstract_words]
             abs_ids_extend_vocab = abstract_to_ids(abstract_words, vocab, article_oovs)
             dec_input, target = get_dec_inp_targ_seqs(abs_ids, max_dec_len, start_decoding, stop_decoding)
             _, target = get_dec_inp_targ_seqs(abs_ids_extend_vocab, max_dec_len, start_decoding, stop_decoding)
@@ -220,7 +219,7 @@ def example_generator(vocab, train_x_path, train_y_path, test_x_path, max_enc_le
             article_words = article.split()[:max_enc_len]
             enc_len = len(article_words)
 
-            enc_input = [vocab.word_to_id(w) for w in article_words]
+            enc_input = [vocab.get_id_by_word(w) for w in article_words]
             # print('enc_input length in generator',len(enc_input)) #99
             enc_input_extend_vocab, article_oovs = article_to_ids(article_words, vocab)
 

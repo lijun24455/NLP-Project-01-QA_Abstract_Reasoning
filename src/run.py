@@ -9,7 +9,6 @@ sys.path.append(BASE_DIR)
 import tensorflow as tf
 import argparse
 
-import os
 import pathlib
 from src.testing import test_and_save
 
@@ -31,7 +30,7 @@ def main():
     #                     type=int)
     parser.add_argument("--batch_size", default=3, help="batch size", type=int)
 
-    parser.add_argument("--vocab_size", default=30000, help="Vocabulary size", type=int)
+    parser.add_argument("--vocab_size", default=50000, help="Vocabulary size", type=int)
     parser.add_argument("--embed_size", default=256, help="Words embeddings dimension", type=int)
     parser.add_argument("--enc_units", default=256, help="Encoder GRU cell units number", type=int)
     parser.add_argument("--dec_units", default=256, help="Decoder GRU cell units number", type=int)
@@ -42,17 +41,17 @@ def main():
     # path
     # /ckpt/checkpoint/checkpoint
     print(BASE_DIR)
-    parser.add_argument("--seq2seq_model_dir", default='/root/pt20200419/ckpt/seq2seq', help="Model folder")
+    parser.add_argument("--seq2seq_model_dir", default=str(root) + '/resource/model/ckpt/seq2seq', help="Model folder")
     parser.add_argument("--model_path", help="Path to a specific model", default="", type=str)
-    parser.add_argument("--train_seg_x_dir", default='/root/pt20200419/data/train_set.seg_x.txt',
+    parser.add_argument("--train_seg_x_dir", default=str(root) + '/resource/gen/train_x_cut_segment.txt',
                         help="train_seg_x_dir")
-    parser.add_argument("--train_seg_y_dir", default='/root/pt20200419/data/train_set.seg_y.txt',
+    parser.add_argument("--train_seg_y_dir", default=str(root) + '/resource/gen/train_y_cut_segment.txt',
                         help="train_seg_y_dir")
-    parser.add_argument("--test_seg_x_dir", default='/root/pt20200419/data/test_set.seg_x.txt',
+    parser.add_argument("--test_seg_x_dir", default=str(root) + '/resource/gen/test_x_cut_segment.txt',
                         help="test_seg_x_dir")
-    parser.add_argument("--vocab_path", default='/root/pt20200419/data/vocab.txt', help="Vocab path")
-    parser.add_argument("--word2vec_output", default='/root/pt20200419/data/word2vec.txt', help="Vocab path")
-    parser.add_argument("--test_save_dir", default='/root/pt20200419/data/', help="test_save_dir")
+    parser.add_argument("--vocab_path", default=str(root) + '/resource/gen/vocabs_w_f.txt', help="Vocab path")
+    parser.add_argument("--word2vec_output", default=str(root) + '/resource/gen/word_embedding', help="Vocab path")
+    parser.add_argument("--test_save_dir", default=str(root) + '/resource/model/test_save/', help="test_save_dir")
 
     # others
     parser.add_argument("--steps_per_epoch", default=200, help="max_train_steps", type=int)
@@ -62,12 +61,13 @@ def main():
     parser.add_argument("--epochs", default=5, help="train epochs", type=int)
 
     # mode
-    parser.add_argument("--mode", default='test', help="training, eval or test options")
+    # parser.add_argument("--mode", default='test', help="training, eval or test options")
+    parser.add_argument("--mode", default='train', help="training, eval or test options")
     parser.add_argument("--model", default='SequenceToSequence', help="which model to be slected")
     parser.add_argument("--pointer_gen", default=True, help="training, eval or test options")
     parser.add_argument("--is_coverage", default=True, help="is_coverage")
     parser.add_argument("--greedy_decode", default=False, help="greedy_decoder")
-    parser.add_argument("--transformer", default=False, help="transformer")
+    # parser.add_argument("--transformer", default=False, help="transformer")
 
     args = parser.parse_args()
     params = vars(args)
