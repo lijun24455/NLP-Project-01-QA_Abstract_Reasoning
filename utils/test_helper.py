@@ -1,6 +1,4 @@
 import tensorflow as tf
-import numpy as np
-from src.utils.batcher_utils import output_to_words
 
 
 def batch_greedy_decode(model, enc_data, vocab, params):

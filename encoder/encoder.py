@@ -23,7 +23,6 @@ class Encoder(tf.keras.Model):
     def call(self, enc_input):
         # (batch_size, enc_len, embedding_dim)
         enc_input_embedded = self.embedding(enc_input)
-        print('enc_input_embedded:' + enc_input_embedded)
 
         initial_state = self.gru.get_initial_state(enc_input_embedded)
 

@@ -1,7 +1,7 @@
 import sys
 import os
 
-from src import training
+import training
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(BASE_DIR)
@@ -10,11 +10,10 @@ import tensorflow as tf
 import argparse
 
 import pathlib
-from src.testing import test_and_save
+from testing import test_and_save
 
 # 获取项目根目录
-root = pathlib.Path(os.path.abspath(__file__)).parent.parent
-
+root = pathlib.Path(os.path.abspath(__file__)).parent
 
 def main():
     parser = argparse.ArgumentParser()
@@ -30,7 +29,7 @@ def main():
     #                     type=int)
     parser.add_argument("--batch_size", default=3, help="batch size", type=int)
 
-    parser.add_argument("--vocab_size", default=50000, help="Vocabulary size", type=int)
+    parser.add_argument("--vocab_size", default=944, help="Vocabulary size", type=int)
     parser.add_argument("--embed_size", default=256, help="Words embeddings dimension", type=int)
     parser.add_argument("--enc_units", default=256, help="Encoder GRU cell units number", type=int)
     parser.add_argument("--dec_units", default=256, help="Decoder GRU cell units number", type=int)
@@ -43,26 +42,27 @@ def main():
     print(BASE_DIR)
     parser.add_argument("--seq2seq_model_dir", default=str(root) + '/resource/model/ckpt/seq2seq', help="Model folder")
     parser.add_argument("--model_path", help="Path to a specific model", default="", type=str)
-    parser.add_argument("--train_seg_x_dir", default=str(root) + '/resource/gen/train_x_cut_segment.txt',
+    parser.add_argument("--train_seg_x_dir", default=str(root) + '/resource/demo/train_x_cut.txt',
                         help="train_seg_x_dir")
-    parser.add_argument("--train_seg_y_dir", default=str(root) + '/resource/gen/train_y_cut_segment.txt',
+    parser.add_argument("--train_seg_y_dir", default=str(root) + '/resource/demo/train_y_cut.txt',
                         help="train_seg_y_dir")
-    parser.add_argument("--test_seg_x_dir", default=str(root) + '/resource/gen/test_x_cut_segment.txt',
+    parser.add_argument("--test_seg_x_dir", default=str(root) + '/resource/demo/test_x_cut.txt',
                         help="test_seg_x_dir")
-    parser.add_argument("--vocab_path", default=str(root) + '/resource/gen/vocabs_w_f.txt', help="Vocab path")
-    parser.add_argument("--word2vec_output", default=str(root) + '/resource/gen/word_embedding', help="Vocab path")
+    parser.add_argument("--vocab_path", default=str(root) + '/resource/demo/vocabs_w_f.txt', help="Vocab path")
+    # parser.add_argument("--word2vec_output", default=str(root) + '/resource/gen/word_embedding', help="Vocab path")
+    parser.add_argument("--word2vec_output", default=str(root) + '/resource/gen/word2vec_ft_bin', help="Vocab path")
     parser.add_argument("--test_save_dir", default=str(root) + '/resource/model/test_save/', help="test_save_dir")
 
     # others
-    parser.add_argument("--steps_per_epoch", default=200, help="max_train_steps", type=int)
+    parser.add_argument("--steps_per_epoch", default=5, help="max_train_steps", type=int)
     parser.add_argument("--checkpoints_save_steps", default=10, help="Save checkpoints every N steps", type=int)
     parser.add_argument("--max_steps", default=10000, help="Max number of iterations", type=int)
     parser.add_argument("--num_to_test", default=10, help="Number of examples to test", type=int)
-    parser.add_argument("--epochs", default=5, help="train epochs", type=int)
+    parser.add_argument("--epochs", default=2, help="train epochs", type=int)
 
     # mode
-    # parser.add_argument("--mode", default='test', help="training, eval or test options")
-    parser.add_argument("--mode", default='train', help="training, eval or test options")
+    parser.add_argument("--mode", default='test', help="training, eval or test options")
+    # parser.add_argument("--mode", default='train', help="training, eval or test options")
     parser.add_argument("--model", default='SequenceToSequence', help="which model to be slected")
     parser.add_argument("--pointer_gen", default=True, help="training, eval or test options")
     parser.add_argument("--is_coverage", default=True, help="is_coverage")

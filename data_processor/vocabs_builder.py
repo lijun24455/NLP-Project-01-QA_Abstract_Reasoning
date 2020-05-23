@@ -1,13 +1,21 @@
 from collections import defaultdict
 
-from src.utils.tools import timeit
+from utils.tools import timeit
 
-train_x_cut_file_path = '../resource/gen/train_x_cut.txt'
-train_y_cut_file_path = '../resource/gen/train_y_cut.txt'
-test_x_cut_file_path = '../resource/gen/test_x_cut.txt'
+# train_x_cut_file_path = '../resource/gen/train_x_cut.txt'
+# train_y_cut_file_path = '../resource/gen/train_y_cut.txt'
+# test_x_cut_file_path = '../resource/gen/test_x_cut.txt'
+#
+# vocabs_w_f_file_path = '../resource/gen/vocabs_w_f.txt'
+# vocabs_f_w_file_path = '../resource/gen/vocabs_f_w.txt'
 
-vocabs_w_f_file_path = '../resource/gen/vocabs_w_f.txt'
-vocabs_f_w_file_path = '../resource/gen/vocabs_f_w.txt'
+# demo
+train_x_cut_file_path = '../resource/demo/train_x_cut.txt'
+train_y_cut_file_path = '../resource/demo/train_y_cut.txt'
+test_x_cut_file_path = '../resource/demo/test_x_cut.txt'
+
+vocabs_w_f_file_path = '../resource/demo/vocabs_w_f.txt'
+vocabs_f_w_file_path = '../resource/demo/vocabs_f_w.txt'
 
 
 # 加载数据

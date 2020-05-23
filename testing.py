@@ -1,11 +1,11 @@
 import tensorflow as tf
-from src.model.seq2seq import SequenceToSequence
-from src.utils.batcher_utils import batcher
-from src.utils.test_helper import batch_greedy_decode
+from model.seq2seq import SequenceToSequence
+from utils.batcher_utils import batcher
+from utils.test_helper import batch_greedy_decode
 from tqdm import tqdm
 import pandas  as pd
 
-from src.utils.tools import Vocab
+from utils.tools import Vocab
 
 
 def test(params):
@@ -49,13 +49,13 @@ def test_and_save(params):
 
 def save_predict_result(results):
     # 读取结果
-    test_df = pd.read_csv('/root/pt20200419/data/test.csv')
+    test_df = pd.read_csv('resource/demo/test.csv')
     # 填充结果
     test_df['Prediction'] = results
     # 　提取ID和预测结果两列
     test_df = test_df[['QID', 'Prediction']]
     # 保存结果.
-    test_df.to_csv('/root/pt20200419/data/test_results.csv', index=None, sep=',')
+    test_df.to_csv('resource/demo/test_results.csv', index=None, sep=',')
 
 
 if __name__ == '__main__':

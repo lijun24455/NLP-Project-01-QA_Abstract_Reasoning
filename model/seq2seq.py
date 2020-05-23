@@ -1,7 +1,7 @@
 import tensorflow as tf
-from src.encoder import encoder
-from src.decoder import decoder
-from src.utils.data_utils import load_word2vec
+from encoder import encoder
+from decoder import decoder
+from utils.data_utils import load_word2vec
 
 
 class SequenceToSequence(tf.keras.Model):
@@ -9,7 +9,6 @@ class SequenceToSequence(tf.keras.Model):
         super(SequenceToSequence, self).__init__()
         self.embedding_matrix = load_word2vec(params)
         self.params = params
-        print(params["batch_size"])
         self.encoder = encoder.Encoder(vocab_size=params["vocab_size"],
                                        embedding_dim=params["embed_size"],
                                        embedding_matrix=self.embedding_matrix,
@@ -37,6 +36,7 @@ class SequenceToSequence(tf.keras.Model):
     #     return pred, dec_hidden, context_vector, attention_weights
 
     def call(self, dec_input, dec_hidden, enc_output, dec_target):
+        print('[call]------>seq2seq')
         predictions = []
         attentions = []
 

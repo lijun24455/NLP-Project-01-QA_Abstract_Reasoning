@@ -1,6 +1,6 @@
 import tensorflow as tf
 import time
-from src.model.losses import loss_function
+from model.losses import loss_function
 import numpy as np
 
 
@@ -8,6 +8,7 @@ def train_model(model, dataset, params, ckpt_manager, vocab):
     print(vocab)
     start_index = vocab.get_id_by_word('[START]')
     pad_index = vocab.get_id_by_word('[PAD]')
+    print('train_model:start_index:{}, pad_index:{}'.format(start_index, pad_index))
 
     optimizer = tf.keras.optimizers.Adam(name='Adam', learning_rate=params["learning_rate"])
 

@@ -72,9 +72,9 @@ class Decoder(tf.keras.Model):
 
         # dec_output shape: batch_size * 1 * embedding_dim + hidden_size ----->
         # dec_output shape == (batch_size * 1, hidden_size)  ??这里output的尺寸是多少？
-        print('[decoder] before reshape dec_output.shape:{}'.format(dec_output.shape()))
+        # print('[decoder] before reshape dec_output.shape:{}'.format(dec_output.shape)) # 3, 1, 256
         dec_output = tf.reshape(dec_output, (-1, dec_output.shape[2]))
-        print('[decoder] after reshape dec_output.shape:{}'.format(dec_output.shape()))
+        # print('[decoder] after reshape dec_output.shape:{}'.format(dec_output.shape)) # 3, 256
 
         # pred shape == (batch_size, vocab)
         pred = self.fc(dec_output) # 可以直接换成softmax

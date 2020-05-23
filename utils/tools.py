@@ -108,12 +108,12 @@ def save_lines_to_path(lines, path):
 
 class Vocab:
     def __init__(self, vocab_file_path, vocab_max_size=None):
-        self.PAD_TOKEN = '<PAD>'
-        self.UNKNOWN_TOKEN = '<UNK>'
-        self.START_DECODING = '<START>'
-        self.STOP_DECODING = '<STOP>'
+        self.PAD_TOKEN = '[PAD]'
+        self.UNKNOWN_TOKEN = '[UNK]'
+        self.START_DECODING = '[START]'
+        self.STOP_DECODING = '[STOP]'
 
-        self.MASK = ['<PAD>', '<UNK>', '<START>', '<STOP>']
+        self.MASK = ['[PAD]', '[UNK]', '[START]', '[STOP]']
         self.MASK_LEN = len(self.MASK)
         self.pad_token_idx = self.MASK.index(self.PAD_TOKEN)
         self.unk_token_idx = self.MASK.index(self.UNKNOWN_TOKEN)

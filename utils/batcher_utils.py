@@ -46,7 +46,7 @@ STOP_DECODING = '[STOP]'
 #             return self.word2id[UNKNOWN_TOKEN]
 #         return self.word2id[word]
 #
-#     def id_to_word(self, word_id):
+#     def get_word_by_id(self, word_id):
 #         if word_id not in self.id2word:
 #             raise ValueError('Id not found in vocab: %d' % word_id)
 #         return self.id2word[word_id]

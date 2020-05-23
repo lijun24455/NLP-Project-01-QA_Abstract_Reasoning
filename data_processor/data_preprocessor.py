@@ -5,7 +5,7 @@ import pandas as pd
 import jieba
 import datetime
 from jieba import posseg
-from src.utils.tools import clean_space, load_lines_from_path
+from utils.tools import clean_space, load_lines_from_path
 
 
 # 读取数据+简单清洗数据
@@ -129,7 +129,7 @@ if __name__ == '__main__':
     REMOVE_WORDS = {'|', '[', ']', '语音', '图片', '語音', '圖片'}
 
     # gen files:
-    vocab_file_path = '../resource/gen/vocab.txt'
+    # vocab_file_path = '../../resource/gen/vocab.txt'
     train_x_file_path = '../resource/gen/train_x.txt'
     train_y_file_path = '../resource/gen/train_y.txt'
     test_x_file_path = '../resource/gen/test_x.txt'
@@ -150,10 +150,10 @@ if __name__ == '__main__':
     save_data_to_file(test_x, test_x_file_path)
     save_data_to_file(test_x, test_x_cut_file_path, cut=True, stop_words=stopwords)
 
-    train_x_vocabs = cut_sentences_to_vocabs(train_x, stopwords)
-    train_y_vocabs = cut_sentences_to_vocabs(train_y, stopwords)
-    test_x_vocabs = cut_sentences_to_vocabs(test_x, stopwords)
+    # train_x_vocabs = cut_sentences_to_vocabs(train_x, stopwords)
+    # train_y_vocabs = cut_sentences_to_vocabs(train_y, stopwords)
+    # test_x_vocabs = cut_sentences_to_vocabs(test_x, stopwords)
 
-    all_vocabs = set.union(train_x_vocabs, train_y_vocabs, test_x_vocabs)
-
-    save_vocabs_to_file_by_one_hot(vocab_file_path, all_vocabs)
+    # all_vocabs = set.union(train_x_vocabs, train_y_vocabs, test_x_vocabs)
+    #
+    # save_vocabs_to_file_by_one_hot(vocab_file_path, all_vocabs)
