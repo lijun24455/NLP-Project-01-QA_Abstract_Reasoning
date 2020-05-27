@@ -4,6 +4,8 @@ import time
 import re
 import numpy as np
 
+from utils.config import *
+
 
 def timeit(f):
     def wrapper(*args, **kwargs):
@@ -79,26 +81,6 @@ def load_pkl(pkl_path):
     return result
 
 
-def load_word2vec(params):
-    """
-    load pretrain word2vec weight matrix
-    :param vocab_size:
-    :return:
-    """
-    word2vec_dict = load_pkl(params['word2vec_output'])
-    vocab_dict = open(params['vocab_path'], encoding='utf-8').readlines()
-    embedding_matrix = np.zeros((params['vocab_size'], params['embed_size']))
-
-    for line in vocab_dict[:params['vocab_size']]:
-        word_id = line.split()
-        word, i = word_id
-        embedding_vector = word2vec_dict.get(word)
-        if embedding_vector is not None:
-            embedding_matrix[int(i)] = embedding_vector
-
-    return embedding_matrix
-
-
 def save_lines_to_path(lines, path):
     print('[save_lines_to_path] lines.len:{}, path:{}'.format(len(lines), path))
     with open(path, 'w', encoding='utf-8') as f:
@@ -153,3 +135,20 @@ class Vocab:
 
     def size(self):
         return self.count
+
+def load_train_dataset():
+    """
+    :return: 加载处理好的数据集
+    """
+    train_x = np.loadtxt(TRAIN_X, delimiter=",", dtype=np.float32)
+    train_y = np.loadtxt(TRAIN_Y, delimiter=",", dtype=np.float32)
+
+    return train_x, train_y
+
+
+def load_test_dataset():
+    """
+    :return: 加载处理好的数据集
+    """
+    test_x = np.loadtxt(TEST_X, delimiter=",", dtype=np.float32)
+    return test_x

@@ -1,42 +1,42 @@
 import tensorflow as tf
-from model.seq2seq import SequenceToSequence
-from utils.batcher_utils import batcher
-from utils.tools import Vocab
-from utils.train_helper import train_model
+from model.seq2seq import Seq2Seq
+from train_helper import *
+from utils.config import *
 
 
 def train(params):
-    global checkpoint_dir, ckpt, model
     assert params["mode"].lower() == "train", "change training mode to 'train'"
 
     vocab = Vocab(params["vocab_path"], params["vocab_size"])
     print('true vocab is ', vocab)
+    params['vocab_size'] = vocab.count
+    params["trained_epoch"] = get_train_msg()
+    params["learning_rate"] *= np.power(0.9, params["trained_epoch"])
 
-    print("Creating the batcher ...")
-    b = batcher(vocab, params)  # 下次PGN详细讲，仅仅是将数据封装成tf特定的格式
+    # 构建模型
     print("Building the model ...")
-    if params["model"] == "SequenceToSequence":
-        model = SequenceToSequence(params)
-    # elif params["model"] == "PGN":
-    #     model = PGN(params)
+    model = Seq2Seq(params)
+    # 获取保存管理者
+    checkpoint = tf.train.Checkpoint(Seq2Seq=model)
+    checkpoint_manager = tf.train.CheckpointManager(checkpoint, SEQ2SEQ_CKPT, max_to_keep=5)
 
-    print("Creating the checkpoint manager")
-    if params["model"] == "SequenceToSequence":
-        checkpoint_dir = "{}/checkpoint".format(params["seq2seq_model_dir"])
-        ckpt = tf.train.Checkpoint(step=tf.Variable(0), SequenceToSequence=model)
-    # elif params["model"] == "PGN":
-    #     checkpoint_dir = "{}/checkpoint".format(params["pgn_model_dir"])
-    #     ckpt = tf.train.Checkpoint(step=tf.Variable(0), PGN=model)
-    ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_dir, max_to_keep=5)
-
-    ckpt.restore(ckpt_manager.latest_checkpoint)
-    if ckpt_manager.latest_checkpoint:
-        print("Restored from {}".format(ckpt_manager.latest_checkpoint))
+    checkpoint.restore(checkpoint_manager.latest_checkpoint)
+    if checkpoint_manager.latest_checkpoint:
+        print("Restored from {}".format(checkpoint_manager.latest_checkpoint))
     else:
         print("Initializing from scratch.")
 
-    print("Starting the training ...")
-    train_model(model, b, params, ckpt_manager, vocab)
+    # 训练模型
+    print("开始训练模型..")
+    print("trained_epoch:", params["trained_epoch"])
+    print("mode:", params["mode"])
+    print("epochs:", params["epochs"])
+    print("batch_size:", params["batch_size"])
+    print("max_enc_len:", params["max_enc_len"])
+    print("max_dec_len:", params["max_dec_len"])
+    print("learning_rate:", params["learning_rate"])
+
+    train_model(model, vocab, params, checkpoint_manager)
 
 
 if __name__ == '__main__':

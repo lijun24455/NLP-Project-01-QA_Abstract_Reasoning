@@ -1,7 +1,7 @@
 import tensorflow as tf
 from model.seq2seq import SequenceToSequence
 from utils.batcher_utils import batcher
-from utils.test_helper import batch_greedy_decode
+from test_helper import batch_greedy_decode
 from tqdm import tqdm
 import pandas  as pd
 

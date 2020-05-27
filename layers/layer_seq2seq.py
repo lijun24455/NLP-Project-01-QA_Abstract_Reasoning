@@ -1,14 +1,48 @@
 import tensorflow as tf
 
 
+class Encoder(tf.keras.Model):
+    def __init__(self, vocab_size, embedding_dim, embedding_matrix, enc_units, batch_size):
+        super(Encoder, self).__init__()
+        self.batch_size = batch_size
+        self.enc_units = enc_units
+        self.use_bi_gru = True
+        # 双向
+        if self.use_bi_gru:
+            self.enc_units = self.enc_units // 2
+
+        self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim, weights=[embedding_matrix],
+                                                   trainable=False)
+        self.gru = tf.keras.layers.GRU(self.enc_units,
+                                       return_sequences=True,
+                                       return_state=True,
+                                       recurrent_initializer='glorot_uniform')
+
+        self.bi_gru = tf.keras.layers.Bidirectional(self.gru)
+
+    def call(self, enc_input):
+        # (batch_size, enc_len, embedding_dim)
+        enc_input_embedded = self.embedding(enc_input)
+        initial_state = self.gru.get_initial_state(enc_input_embedded)
+
+        if self.use_bi_gru:
+            # 是否使用双向GRU
+            output, forward_state, backward_state = self.bi_gru(enc_input_embedded, initial_state=initial_state * 2)
+            enc_hidden = tf.keras.layers.concatenate([forward_state, backward_state], axis=-1)
+
+        else:
+            # 单向GRU
+            output, enc_hidden = self.gru(enc_input_embedded, initial_state=initial_state)
+
+        return output, enc_hidden
+
+
 class BahdanauAttention(tf.keras.layers.Layer):
     def __init__(self, units):
         super(BahdanauAttention, self).__init__()
         self.W1 = tf.keras.layers.Dense(units)
         self.W2 = tf.keras.layers.Dense(units)
         self.V = tf.keras.layers.Dense(1)
-
-        #  model.keras.layers.Dense
 
     def call(self, dec_hidden, enc_output):
         # dec_hidden shape == (batch_size, hidden size)
@@ -50,7 +84,7 @@ class Decoder(tf.keras.Model):
                                        return_sequences=True,
                                        return_state=True,
                                        recurrent_initializer='glorot_uniform')
-        self.fc = tf.keras.layers.Dense(vocab_size) # 多维
+        self.fc = tf.keras.layers.Dense(vocab_size)
 
     def call(self, dec_input, prev_dec_hidden, enc_output, context_vector):
         # 使用上次的隐藏层（第一次使用编码器隐藏层）、编码器输出计算注意力权重
@@ -61,21 +95,14 @@ class Decoder(tf.keras.Model):
 
         # 将上一循环的预测结果跟注意力权重值结合在一起作为本次的GRU网络输入
         # dec_input (batch_size, 1, embedding_dim + hidden_size)
-
-        # context_vector.shape : batch_size * hidden_size ---empand--->batch_size * 1 * hidden_size
-        # dec_input.shape:(batch_size, 1, embedding_dim)
-        # concat 后，dec_input.shape:batch_size * 1 * embedding_dim + hidden_size
-
         dec_input = tf.concat([tf.expand_dims(context_vector, 1), dec_input], axis=-1)
+
         # passing the concatenated vector to the GRU
         dec_output, dec_hidden = self.gru(dec_input)
 
-        # dec_output shape: batch_size * 1 * embedding_dim + hidden_size ----->
-        # dec_output shape == (batch_size * 1, hidden_size)  ??这里output的尺寸是多少？
-        # print('[decoder] before reshape dec_output.shape:{}'.format(dec_output.shape)) # 3, 1, 256
+        # dec_output shape == (batch_size * 1, hidden_size)
         dec_output = tf.reshape(dec_output, (-1, dec_output.shape[2]))
-        # print('[decoder] after reshape dec_output.shape:{}'.format(dec_output.shape)) # 3, 256
 
         # pred shape == (batch_size, vocab)
-        pred = self.fc(dec_output) # 可以直接换成softmax
+        pred = self.fc(dec_output)
         return pred, dec_hidden
