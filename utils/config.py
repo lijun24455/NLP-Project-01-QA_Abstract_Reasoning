@@ -1,10 +1,12 @@
 import argparse
 
-from utils.tools import Vocab
 import os
 import pathlib
 
 # 一些变量
+from utils.tools import *
+from utils.vocab import Vocab
+
 root = pathlib.Path(os.path.abspath(__file__)).parent.parent
 
 # 训练数据与测试数据集
@@ -45,34 +47,44 @@ EMBEDDING_MATRIX_PAD = os.path.join(root, 'data', 'wv', 'embedding_matrix_pad.tx
 WV_MODEL_PAD = os.path.join(root, 'data', 'wv', 'word2vec_pad.model')
 
 # 存档
-CKPT_DIR = os.path.join(root, 'data', 'checkpoints', 'training_checkpoints')
-CKPT_PREFIX = os.path.join(CKPT_DIR, "ckpt")
-SEQ2SEQ_CKPT = os.path.join(root, 'data', 'checkpoints', 'seq2seq_checkpoints')
-PGN_CKPT = os.path.join(root, 'data', 'checkpoints', 'pgn_checkpoints')
-TEMP_CKPT = os.path.join(root, 'data', 'checkpoints', 'temp_checkpoints')
-#其他
+SEQ2SEQ_CKPT = os.path.join(root, 'resource', 'model', 'seq2seq', 'checkpoints')
+PGN_CKPT = os.path.join(root, 'resource', 'model', 'pgn', 'checkpoints')
+# 其他
 FONT = os.path.join(root, 'data', 'TrueType', 'simhei.ttf')
 PARAMS_FROM_DATASET = os.path.join(root, 'data', 'params_from_dataset.txt')
 
 # 结果
-RESULT_DIR = os.path.join(root, 'data', 'result')
+RESULT_DIR = os.path.join(root, 'resource', 'result')
 
-TRAIN_PICKLE_DIR = os.path.join(root, 'data', 'dataset')
+TRAIN_PICKLE_DIR = os.path.join(root, 'resource', 'dataset')
 
 EPOCH = 4
 BATCH_SIZE = 16
 NUM_SAMPLES = 81391
 
+
+def get_result_file_name():
+    """
+    获取结果文件的名称
+    :return:  20191209_16h49m32s_res.csv
+    """
+    now = time.strftime('%Y_%m_%d_%H_%M_%S')
+
+    file_name = os.path.join(RESULT_DIR, now + "_result.csv")
+    return file_name
+
+
 def get_params():
-    vocab = Vocab(VOCAB_PAD)
-    steps_per_epoch = NUM_SAMPLES//BATCH_SIZE  # 不算多余的
+    # vocab = Vocab(VOCAB_PAD)
+    vocab = Vocab(VOCAB)
+    steps_per_epoch = NUM_SAMPLES // BATCH_SIZE  # 不算多余的
     parser = argparse.ArgumentParser()
 
     # 调试选项
     parser.add_argument("--mode", default='train', help="run mode", type=str)
     parser.add_argument("--decode_mode", default='greedy', help="decode mode greedy/beam", type=str)
     parser.add_argument("--greedy_decode", default=True, help="if greedy decode", type=bool)
-    parser.add_argument("--debug_mode", default=False, help="debug mode", type=bool)
+    parser.add_argument("--debug_mode", default=True, help="debug mode", type=bool)
     parser.add_argument("--beam_size", default=3,
                         help="beam size for beam search decoding (must be equal to batch size in decode mode)",
                         type=int)
@@ -111,7 +123,7 @@ def get_params():
 
     # 模型参数
     parser.add_argument("--embed_size",
-                        default=300,
+                        default=256,
                         help="Words embeddings dimension",
                         type=int)
     parser.add_argument("--enc_units", default=256, help="Encoder GRU cell units number", type=int)
@@ -121,7 +133,8 @@ def get_params():
                         type=int)
 
     # 相关文件路径
-    parser.add_argument("--vocab_path", default=VOCAB_PAD, help="vocab path", type=str)
+    parser.add_argument("--vocab_path", default=VOCAB, help="vocab path", type=str)
+    parser.add_argument("--w2v_output", default=WV_MODEL, help="w2v_bin path", type=str)
     parser.add_argument("--train_seg_x_dir", default=TRAIN_SEG_X, help="train_seg_x_dir", type=str)
     parser.add_argument("--train_seg_y_dir", default=TRAIN_SEG_Y, help="train_seg_y_dir", type=str)
     parser.add_argument("--test_seg_x_dir", default=TEST_SEG_X, help="train_seg_x_dir", type=str)
@@ -151,3 +164,4 @@ params = get_params()
 if __name__ == "__main__":
     # get_params_from_dataset(check=True)
     params = get_params()
+    print('vocab_path:',params['vocab_path'])

@@ -1,13 +1,14 @@
 import tensorflow as tf
 # from utils.saveLoader import load_embedding_matrix
-from layers.layer_seq2seq import Encoder, BahdanauAttention, Decoder
-from utils.data_utils import load_word2vec
+from seq2seq.layers import Encoder, BahdanauAttention, Decoder
+from utils.tools import load_embedding_matrix
 
 
 class Seq2Seq(tf.keras.Model):
     def __init__(self, params):
         super(Seq2Seq, self).__init__()
-        self.embedding_matrix = load_word2vec(params)
+        # self.embedding_matrix = load_word2vec(params)
+        self.embedding_matrix = load_embedding_matrix(params['w2v_output'], params['vocab_path'], params['vocab_size'], params['embed_size'])
         self.params = params
         self.encoder = Encoder(vocab_size = params["vocab_size"],
                                embedding_dim = params["embed_size"],
@@ -40,6 +41,10 @@ class Seq2Seq(tf.keras.Model):
         attentions = []
 
         context_vector, _ = self.attention(dec_hidden, enc_output)
+
+        # shape == (batch_size, max_length, hidden_size)
+        # enc_input.shape:(batch_size, )
+        # dec_target.shape:(batch_size, max_length,  )
 
         for t in range(1, dec_target.shape[1]):
             pred, dec_hidden = self.decoder(dec_input,

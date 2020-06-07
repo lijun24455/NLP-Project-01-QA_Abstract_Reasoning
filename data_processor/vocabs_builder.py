@@ -2,20 +2,20 @@ from collections import defaultdict
 
 from utils.tools import timeit
 
-# train_x_cut_file_path = '../resource/gen/train_x_cut.txt'
-# train_y_cut_file_path = '../resource/gen/train_y_cut.txt'
-# test_x_cut_file_path = '../resource/gen/test_x_cut.txt'
-#
-# vocabs_w_f_file_path = '../resource/gen/vocabs_w_f.txt'
-# vocabs_f_w_file_path = '../resource/gen/vocabs_f_w.txt'
+train_x_cut_file_path = '../resource/gen/train_x_cut.txt'
+train_y_cut_file_path = '../resource/gen/train_y_cut.txt'
+test_x_cut_file_path = '../resource/gen/test_x_cut.txt'
+
+vocabs_w_f_file_path = '../resource/gen/vocabs_w_f.txt'
+vocabs_f_w_file_path = '../resource/gen/vocabs_f_w.txt'
 
 # demo
-train_x_cut_file_path = '../resource/demo/train_x_cut.txt'
-train_y_cut_file_path = '../resource/demo/train_y_cut.txt'
-test_x_cut_file_path = '../resource/demo/test_x_cut.txt'
-
-vocabs_w_f_file_path = '../resource/demo/vocabs_w_f.txt'
-vocabs_f_w_file_path = '../resource/demo/vocabs_f_w.txt'
+# train_x_cut_file_path = '../resource/demo/train_x_cut.txt'
+# train_y_cut_file_path = '../resource/demo/train_y_cut.txt'
+# test_x_cut_file_path = '../resource/demo/test_x_cut.txt'
+#
+# vocabs_w_f_file_path = '../resource/demo/vocabs_w_f.txt'
+# vocabs_f_w_file_path = '../resource/demo/vocabs_f_w.txt'
 
 
 # 加载数据
@@ -44,6 +44,9 @@ def build_vocabs(items, sort=True, min_count=0, lower=False):
     # defaultdict 当字典里的key不存在但被查找时，返回的不是keyError而是一个默认值,int的默认值是0
     dic = defaultdict(int)
     for item in items:
+        if len(item.strip()) < 1:
+            print('[null word!]')
+            continue
         if lower:
             item.lower()
         dic[item] += 1

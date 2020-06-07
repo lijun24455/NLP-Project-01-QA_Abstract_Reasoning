@@ -1,9 +1,9 @@
-import tensorflow as tf
 import time
-import numpy as np
 
-from batcher import batcher
-from loss_function import loss_function
+import tensorflow as tf
+
+from utils.batcher import batcher
+from loss import loss_function
 from utils.config import *
 
 
@@ -14,7 +14,7 @@ def get_train_msg():
         trained_epoch = int(f.read())
     return trained_epoch
 
-ß
+
 def save_train_msg(trained_epoch):
     # 保存训练信息（已训练的轮数）
     path = os.path.join(SEQ2SEQ_CKPT, "trained_epoch.txt")
@@ -23,19 +23,16 @@ def save_train_msg(trained_epoch):
 
 
 def train_model(model, vocab, params, checkpoint_manager):
-    print(vocab)
-
     epochs = params['epochs']
     batch_size = params['batch_size']
 
-    start_index = vocab.get_id_by_word('[START]')
-    pad_index = vocab.get_id_by_word('[PAD]')
+    start_index = vocab.get_id_by_word(vocab.START_DECODING)
+    pad_index = vocab.get_id_by_word(vocab.PAD_TOKEN)
     print('train_model:start_index:{}, pad_index:{}'.format(start_index, pad_index))
 
     optimizer = tf.keras.optimizers.Adam(name='Adam', learning_rate=params["learning_rate"])
 
     def train_step(enc_input, dec_target):
-        # dec_target [4980, 939, 41, 27, 4013, 815, 14702]
 
         with tf.GradientTape() as tape:
             # enc_output (batch_size, enc_len, enc_unit)
@@ -53,7 +50,7 @@ def train_model(model, vocab, params, checkpoint_manager):
             # predictions (batch_size, dec_len-1, vocab_size)
             predictions, _ = model(dec_input, dec_hidden, enc_output, dec_target)
 
-            _batch_loss = loss_function(dec_target[:, 1:], predictions)
+            _batch_loss = loss_function(dec_target[:, 1:], predictions, vocab.pad_token_idx)
 
         variables = model.trainable_variables
         gradients = tape.gradient(_batch_loss, variables)
@@ -64,12 +61,12 @@ def train_model(model, vocab, params, checkpoint_manager):
     dataset = batcher(vocab, params)
     steps_per_epoch = params["steps_per_epoch"]
 
-    for epoch in range(params['epochs']):
+    for epoch in range(epochs):
         start = time.time()
         step = 0
         total_loss = 0
         # print(len(dataset.take(params['steps_per_epoch'])))
-        for (step, batch) in enumerate(dataset.take(params['steps_per_epoch'])):
+        for (step, batch) in enumerate(dataset.take(steps_per_epoch)):
             # 讲设你的样本数是1000，batch size10,一个epoch，我们一共有100次，200， 500， 40，20.
             # batch_loss = train_step(batch[0]["enc_input"],  # shape=(16, 200)
             #                         batch[1]["dec_target"])  # shape=(16, 50)
@@ -97,7 +94,7 @@ def train_model(model, vocab, params, checkpoint_manager):
                 if step >= 10:
                     break
 
-        if epoch % 1 == 0:  # 改成增加评价函数，在验证集上做验证，只要比上次好就保存一次
+        if epoch % 1 == 0:
             ckpt_save_path = checkpoint_manager.save()
             print('Saving checkpoint for epoch {} at {} ,best loss {}'.format(epoch + 1, ckpt_save_path,
                                                                               total_loss / step))

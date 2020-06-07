@@ -3,6 +3,7 @@ import pickle
 import time
 import re
 import numpy as np
+from gensim.models import KeyedVectors
 
 from utils.config import *
 
@@ -88,54 +89,6 @@ def save_lines_to_path(lines, path):
             f.write('{}\n'.format(line))
 
 
-class Vocab:
-    def __init__(self, vocab_file_path, vocab_max_size=None):
-        self.PAD_TOKEN = '[PAD]'
-        self.UNKNOWN_TOKEN = '[UNK]'
-        self.START_DECODING = '[START]'
-        self.STOP_DECODING = '[STOP]'
-
-        self.MASK = ['[PAD]', '[UNK]', '[START]', '[STOP]']
-        self.MASK_LEN = len(self.MASK)
-        self.pad_token_idx = self.MASK.index(self.PAD_TOKEN)
-        self.unk_token_idx = self.MASK.index(self.UNKNOWN_TOKEN)
-        self.start_token_idx = self.MASK.index(self.START_DECODING)
-        self.stop_token_idx = self.MASK.index(self.STOP_DECODING)
-
-        self.word2id, self.id2word = self.load_vocab(vocab_file_path, vocab_max_size)
-        self.count = len(self.word2id)
-
-    def load_vocab(self, vocab_file_path, vocab_max_size):
-        word2id = {mask: idx for idx, mask in enumerate(self.MASK)}
-        id2word = {idx: mask for idx, mask in enumerate(self.MASK)}
-
-        with open(vocab_file_path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-        print('file lines cnt : {}'.format(len(lines)))
-        for line in lines:
-            word, id = line.strip().split()
-            id = int(id)
-            if vocab_max_size and id > vocab_max_size - self.MASK_LEN - 1:
-                break
-            word2id[word] = id + self.MASK_LEN
-            id2word[id + self.MASK_LEN] = word
-        return word2id, id2word
-
-    def get_id_by_word(self, word):
-        if word not in self.word2id:
-            return self.word2id[self.UNKNOWN_TOKEN]
-        else:
-            return self.word2id[word]
-
-    def get_word_by_id(self, id):
-        if id not in self.id2word:
-            return self.id2word[self.unk_token_idx]
-        else:
-            return self.id2word[id]
-
-    def size(self):
-        return self.count
-
 def load_train_dataset():
     """
     :return: 加载处理好的数据集
@@ -152,3 +105,58 @@ def load_test_dataset():
     """
     test_x = np.loadtxt(TEST_X, delimiter=",", dtype=np.float32)
     return test_x
+
+
+def load_pkl(pkl_path):
+    """
+    加载词典文件
+    :param pkl_path:
+    :return:
+    """
+    with open(pkl_path, 'rb') as f:
+        result = pickle.load(f)
+    return result
+
+
+def load_embedding_matrix(w2v_model_path, vocab_path, vocab_size, embed_size):
+    """
+    load pretrain word2vec weight matrix
+    :param vocab_size:
+    :return embedding_matrix:
+    """
+    # word2vec_dict = load_pkl(params['word2vec_output'])
+    w2v = KeyedVectors.load_word2vec_format(w2v_model_path, binary=True)
+    vocab_dict = open(vocab_path, encoding='utf-8').readlines()
+    print('[load_word2vec]:vocab_dict.len:{}'.format(len(vocab_dict)))
+    embedding_matrix = np.zeros((vocab_size, embed_size))
+
+    for line in vocab_dict[:vocab_size]:
+        word_id = line.split()
+        if len(word_id) < 2:
+            print('empty word:{}'.format(line))
+            continue
+        word, i = word_id
+        if word in w2v.vocab:
+            embedding_matrix[int(i)] = w2v[word]
+        else:
+            embedding_matrix[int(i)] = np.random.uniform(-10, 10, 256)
+    print('embedding_m.shape:{}'.format(embedding_matrix.shape))
+    return embedding_matrix
+
+def dump_pkl(vocab, pkl_path, overwrite=True):
+    """
+    存储文件
+    :param pkl_path:
+    :param overwrite:
+    :return:
+    """
+    if pkl_path and os.path.exists(pkl_path) and not overwrite:
+        return
+    if pkl_path:
+        with open(pkl_path, 'wb') as f:
+            pickle.dump(vocab, f, protocol=pickle.HIGHEST_PROTOCOL)
+            # pickle.dump(vocab, f, protocol=0)
+        print("save %s ok." % pkl_path)
+
+
+

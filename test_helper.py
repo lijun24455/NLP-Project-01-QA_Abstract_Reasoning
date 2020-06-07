@@ -1,4 +1,21 @@
 import tensorflow as tf
+from tqdm import tqdm
+
+
+def greedy_decode(model, test_x, vocab, params):
+    # 存储结果
+    batch_size = params["batch_size"]
+    results = []
+
+    sample_size = len(test_x)
+    # batch 操作轮数 math.ceil向上取整 小数 +1
+    # 因为最后一个batch可能不足一个batch size 大小 ,但是依然需要计算
+    steps_epoch = sample_size // batch_size + 1
+    # [0,steps_epoch)
+    for i in tqdm(range(steps_epoch)):
+        batch_data = test_x[i * batch_size:(i + 1) * batch_size]
+        results += batch_greedy_decode(model, batch_data, vocab, params)
+    return results
 
 
 def batch_greedy_decode(model, enc_data, vocab, params):

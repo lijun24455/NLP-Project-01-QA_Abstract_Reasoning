@@ -16,18 +16,18 @@ def save_file_segment(from_path, to_path, line_cnt):
 
 
 if __name__ == '__main__':
-    train_x_path = 'resource/gen/train_x_cut.txt'
-    train_y_path = 'resource/gen/train_y_cut.txt'
-    test_x_path = 'resource/gen/test_x_cut.txt'
+    train_x_path = '../resource/gen/train_x_cut.txt'
+    train_y_path = '../resource/gen/train_y_cut.txt'
+    test_x_path = '../resource/gen/test_x_cut.txt'
 
     # gen files
-    train_x_seg_path = 'resource/demo/train_x_cut.txt'
-    train_y_seg_path = 'resource/demo/train_y_cut.txt'
-    test_x_seg_path = 'resource/demo/test_x_cut.txt'
+    train_x_seg_path = '../resource/demo/train_x_cut.txt'
+    train_y_seg_path = '../resource/demo/train_y_cut.txt'
+    test_x_seg_path = '../resource/demo/test_x_cut.txt'
 
-    save_file_segment(train_x_path, train_x_seg_path, 20)
-    save_file_segment(train_y_path, train_y_seg_path, 20)
-    save_file_segment(test_x_path, test_x_seg_path, 20)
+    # save_file_segment(train_x_path, train_x_seg_path, 20)
+    # save_file_segment(train_y_path, train_y_seg_path, 20)
+    # save_file_segment(test_x_path, test_x_seg_path, 20)
 
     # seq_cnt_dict = defaultdict(int)
     # with open(train_x_path, 'r', encoding='utf-8') as f:
@@ -45,4 +45,11 @@ if __name__ == '__main__':
     #
     # root = pathlib.Path(os.path.abspath(__file__)).parent.parent
     # print(root)
+
+    vocab_path = "../resource/gen/vocabs_w_f.txt"
+    with open(vocab_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            if len(line.split()) < 2:
+                print(line)
+                print(len(line), '------>', len(line.strip()))
 

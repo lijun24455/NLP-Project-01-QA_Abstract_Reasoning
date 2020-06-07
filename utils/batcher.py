@@ -1,5 +1,5 @@
 import tensorflow as tf
-from utils.tools import Vocab, load_train_dataset, load_test_dataset
+from utils.tools import load_train_dataset, load_test_dataset
 
 
 def train_batch_generator(batch_size, sample_sum=None):
@@ -27,10 +27,6 @@ def beam_test_batch_generator(beam_size):
         yield beam_search_data
 
 
-# if __name__ == '__main__':
-#     gen = beam_test_batch_generator(3)
-
-
 # todo: 预处理数据时不应该截断句子，而是在载入数据集的时候截断
 def get_dec_inp_targ_seqs(sequence, max_len, start_id, stop_id):
     inp = [start_id] + sequence[:]
@@ -45,8 +41,8 @@ def get_dec_inp_targ_seqs(sequence, max_len, start_id, stop_id):
 
 
 def example_generator(params, vocab):
-    start_decoding = vocab.word_to_id(Vocab.START_DECODING)  # 14700
-    stop_decoding = vocab.word_to_id(Vocab.STOP_DECODING)  # 14702
+    start_decoding = vocab.get_id_by_word(vocab.START_DECODING)
+    stop_decoding = vocab.get_id_by_word(vocab.STOP_DECODING)
 
     if params["mode"] == "train":
         # 载入训练集的特征x和标签y
@@ -62,7 +58,7 @@ def example_generator(params, vocab):
             article = raw_record[0].numpy().decode("utf-8")  # '新能源 车 最大 短板 '
             article_words = article.split()[:params["max_enc_len"] - 2]  # ['新能源', '车', '最大', '短板']
 
-            enc_input = [vocab.word_to_id(w) for w in article_words]  # [6080, 14, 1250, 14701]
+            enc_input = [vocab.get_id_by_word(w) for w in article_words]  # [6080, 14, 1250, 14701]
             enc_input = [start_decoding] + enc_input + [stop_decoding]  # [14700, 6080, 14, 1250, 14701, 14702]
 
             # enc_len = len(enc_input)  # 6
@@ -72,7 +68,7 @@ def example_generator(params, vocab):
             abstract = raw_record[1].numpy().decode("utf-8")  # '在于 充电 还有 一个 续航 里程'
             abstract_words = abstract.split()[:params["max_dec_len"] - 2]  # ['在于', '充电', '还有', '一个', '续航', '里程']
 
-            target = [vocab.word_to_id(w) for w in abstract_words]  # [4980, 939, 41, 27, 4013, 815]
+            target = [vocab.get_id_by_word(w) for w in abstract_words]  # [4980, 939, 41, 27, 4013, 815]
             target = [start_decoding] + target + [stop_decoding]
 
             # dec_input, target = get_dec_inp_targ_seqs(abs_ids, params["max_dec_len"]-1, start_decoding, stop_decoding)
@@ -105,7 +101,7 @@ def example_generator(params, vocab):
             article = raw_record.numpy().decode("utf-8")  # '新能源 车 最大 短板 '
             article_words = article.split()[:params["max_enc_len"]]  # ['新能源', '车', '最大', '短板']
 
-            enc_input = [vocab.word_to_id(w) for w in article_words]  # [6080, 14, 1250, 14701]
+            enc_input = [vocab.get_id_by_word(w) for w in article_words]  # [6080, 14, 1250, 14701]
             enc_input = [start_decoding] + enc_input + [stop_decoding]  # [14700, 6080, 14, 1250, 14701, 14702]
 
             # enc_len = len(enc_input)  # 6
@@ -177,13 +173,13 @@ def batch_generator(generator, params, vocab):
 
     padding_values = {
         # "article": b"",  #
-        "enc_input": vocab.word2id[Vocab.PAD_TOKEN],  # 用pad的id来填充
+        "enc_input": vocab.get_id_by_word(vocab.PAD_TOKEN),  # 用pad的id来填充
         # "sample_encoder_pad_mask": 0,  # 多余的用0填充
         # "enc_len": -1,  # 不限
 
         # "abstract": b"",  # 不限
         # "dec_input": vocab.word2id[Vocab.PAD_TOKEN],  # 用pad的id来填充
-        "target": vocab.word2id[Vocab.PAD_TOKEN],  # 用pad的id来填充
+        "target": vocab.get_id_by_word(vocab.PAD_TOKEN),  # 用pad的id来填充
         # "dec_mask": 0.,  # 多余的用0填充
         # "dec_len": -1,
     }
@@ -222,7 +218,9 @@ def batcher(vocab, params):
 
 
 if __name__ == "__main__":
-    pass
+    gen = beam_test_batch_generator(3)
+    print()
+    # pass
     # "<START>" 14712
     # "<UNK>" 14713
     # "<STOP>" 14714
