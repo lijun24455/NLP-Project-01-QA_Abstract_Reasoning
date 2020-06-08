@@ -1,13 +1,12 @@
 import tensorflow as tf
 
 from seq2seq.model import Seq2Seq
-from utils.batcher_utils import batcher
-from test_helper import batch_greedy_decode, greedy_decode
-from tqdm import tqdm
-import pandas  as pd
+from utils.batcher import beam_test_batch_generator
+from utils.test_helper import greedy_decode
+import pandas as pd
 
-from utils.tools import Vocab
 from utils.config import *
+from utils.tools import *
 
 
 def test(params):

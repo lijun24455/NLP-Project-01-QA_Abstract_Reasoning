@@ -20,7 +20,7 @@ def train_batch_generator(batch_size, sample_sum=None):
 
 
 def beam_test_batch_generator(beam_size):
-    # 加载数据集
+    # 加载数据集 每行复制了beam_size条
     test_x = load_test_dataset()
     for row in test_x:
         beam_search_data = tf.convert_to_tensor([row for _ in range(beam_size)])

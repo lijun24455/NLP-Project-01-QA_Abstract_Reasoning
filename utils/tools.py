@@ -143,6 +143,7 @@ def load_embedding_matrix(w2v_model_path, vocab_path, vocab_size, embed_size):
     print('embedding_m.shape:{}'.format(embedding_matrix.shape))
     return embedding_matrix
 
+
 def dump_pkl(vocab, pkl_path, overwrite=True):
     """
     存储文件
@@ -157,6 +158,3 @@ def dump_pkl(vocab, pkl_path, overwrite=True):
             pickle.dump(vocab, f, protocol=pickle.HIGHEST_PROTOCOL)
             # pickle.dump(vocab, f, protocol=0)
         print("save %s ok." % pkl_path)
-
-
-

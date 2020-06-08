@@ -1,5 +1,5 @@
 from seq2seq.model import Seq2Seq
-from train_helper import *
+from utils.train_helper import *
 from utils.config import *
 from utils.vocab import Vocab
 
