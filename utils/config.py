@@ -35,8 +35,8 @@ TEST_SEG_X = os.path.join(root, 'resource', 'gen', 'test_x_cut.txt')
 DATASET_MSG = os.path.join(root, 'resource', 'gen', 'dataset_msg.txt')
 
 TRAIN_X = os.path.join(root, 'resource', 'gen', 'train_x_cut.txt')
-TRAIN_Y = os.path.join(root, 'resource', 'gen' 'train_y_cut.txt')
-TEST_X = os.path.join(root, 'resource', 'gen' 'test_x_cut.txt')
+TRAIN_Y = os.path.join(root, 'resource', 'gen', 'train_y_cut.txt')
+TEST_X = os.path.join(root, 'resource', 'gen', 'test_x_dataset.txt')
 
 # 词向量模型
 WV_MODEL = os.path.join(root, 'resource', 'gen', 'word2vec_ft_bin')

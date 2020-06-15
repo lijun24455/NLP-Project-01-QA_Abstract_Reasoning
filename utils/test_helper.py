@@ -20,13 +20,15 @@ def greedy_decode(model, test_x, vocab, params):
 
 def batch_greedy_decode(model, enc_data, vocab, params):
     # 判断输入长度
-    # print(enc_data)
-    global outputs
-    batch_data = enc_data[0]["enc_input"]
-    batch_size = enc_data[0]["enc_input"].shape[0]
+    # 判断输入长度
+    batch_size = len(enc_data)
     # 开辟结果存储list
     predicts = [''] * batch_size
-    inputs = batch_data
+
+    inputs = tf.convert_to_tensor(enc_data)
+    # 开辟结果存储list
+    predicts = [''] * batch_size
+    inputs = enc_data
 
     enc_output, enc_hidden = model.encoder(inputs)
     dec_hidden = enc_hidden

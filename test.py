@@ -2,7 +2,7 @@ import tensorflow as tf
 
 from seq2seq.model import Seq2Seq
 from utils.batcher import beam_test_batch_generator
-from utils.test_helper import greedy_decode
+from utils.test_helper import greedy_decode, beam_decode
 import pandas as pd
 
 from utils.config import *
@@ -112,4 +112,8 @@ def save_predict_result(results, result_save_path):
 
 
 if __name__ == '__main__':
-    test('我的帕萨特烧机油怎么办')
+    params = get_params()
+    params["mode"] = "test"
+    params["batch_size"] = params["beam_size"]
+    results = test(params)
+

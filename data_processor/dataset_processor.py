@@ -53,6 +53,6 @@ if __name__ == '__main__':
     vocab_file = '../resource/gen/vocabs_w_f.txt'
     max_len = 200
 
-    vocab = Vocab(vocab_file, vocab_max_size=50000)
+    vocab = Vocab(vocab_file, vocab_max_size=None)
     dataset = seg_text_to_ids(test_seg_text_path, vocab, max_len)
     save_dataset_file(dataset, test_dataset_path)
